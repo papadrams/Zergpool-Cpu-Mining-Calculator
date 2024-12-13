@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zergpool CPU Mining Profitability</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    p {
+      text-align: center;
+      font-size: 16px;
+      color: #555;
+    }
+
+    /* Form Styles */
+    .form-section {
+      margin: 30px auto;
+      max-width: 1200px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 180px;
+    }
+    .form-group label {
+      font-size: 14px;
+      margin-bottom: 8px;
+      text-align: center;
+      font-weight: bold;
+      color: #34495e;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+    .form-group input:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+      outline: none;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    /* Table Styles */
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      font-size: 16px;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    table th, table td {
+      padding: 12px 15px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+    table th {
+      background-color: #34495e;
+      color: white;
+    }
+    table tr:nth-child(even) {
+      background-color: #f4f4f9;
+    }
+    table tr:hover {
+      background-color: #e9f5fe;
+    }
+    .results-section {
+      text-align: center;
+      margin-top: 20px;
+      color: #34495e;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .form-group {
+        width: 100%;
+      }
+      table {
+        font-size: 14px;
+      }
+    }
+  </style>
+  <script>
+    async function calculateProfitability(event) {
+      event.preventDefault();
+
+      try {
+        const response = await fetch('https://zergpool.com/api/currencies');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        const btcPriceResponse = await fetch('https://api.coindesk.com/v1/bpi/currentprice/USD.json');
+        if (!btcPriceResponse.ok) {
+          throw new Error(`HTTP error! status: ${btcPriceResponse.status}`);
+        }
+        const btcPriceData = await btcPriceResponse.json();
+        const btcToUsd = parseFloat(btcPriceData.bpi.USD.rate.replace(',', ''));
+
+        const results = [];
+        const inputHashrate = parseFloat(document.getElementById('hashrate_input').value.replace(",", ".") || 0);
+        const randomxHashrate = parseFloat(document.getElementById('hashrate_randomx').value.replace(",", ".") || 0);
+        const verushashHashrate = parseFloat(document.getElementById('hashrate_verushash').value.replace(",", ".") || 0);
+        const xelisv2Hashrate = parseFloat(document.getElementById('hashrate_xelisv2').value.replace(",", ".") || 0);
+        const yespowerTideHashrate = parseFloat(document.getElementById('hashrate_yespowerTIDE').value.replace(",", ".") || 0);
+        const scryptn2Hashrate = parseFloat(document.getElementById('hashrate_scryptn2').value.replace(",", ".") || 0);
+        const randomxeqHashrate = parseFloat(document.getElementById('hashrate_randomxeq').value.replace(",", ".") || 0);
+        const ghostriderHashrate = parseFloat(document.getElementById('hashrate_ghostrider').value.replace(",", ".") || 0);
+        const randomarqHashrate = parseFloat(document.getElementById('hashrate_randomarq').value.replace(",", ".") || 0);
+        const pantheraHashrate = parseFloat(document.getElementById('hashrate_panthera').value.replace(",", ".") || 0);
+        const minotaurxHashrate = parseFloat(document.getElementById('hashrate_minotaurx').value.replace(",", ".") || 0);
+        const mikeHashrate = parseFloat(document.getElementById('hashrate_mike').value.replace(",", ".") || 0);
+        const flexHashrate = parseFloat(document.getElementById('hashrate_flex').value.replace(",", ".") || 0);
+        const cryptonightUpxHashrate = parseFloat(document.getElementById('hashrate_cryptonight_upx').value.replace(",", ".") || 0);
+
+        if (
+          inputHashrate === 0 &&
+          randomxHashrate === 0 &&
+          verushashHashrate === 0 &&
+          xelisv2Hashrate === 0 &&
+          yespowerTideHashrate === 0 &&
+          scryptn2Hashrate === 0 &&
+          randomxeqHashrate === 0 &&
+          ghostriderHashrate === 0 &&
+          randomarqHashrate === 0 &&
+          pantheraHashrate === 0 &&
+          minotaurxHashrate === 0 &&
+          mikeHashrate === 0 &&
+          flexHashrate === 0 &&
+          cryptonightUpxHashrate === 0
+        ) {
+          alert("Please enter a valid hashrate for at least one algorithm.");
+          return;
+        }
+
+        const targetAlgorithms = [
+          "cpupower", "power2b", "yescryptR16", "yespowerLTNCG",
+          "yespower", "yespowerMGPC", "yespowerR16",
+          "yespowerSUGAR", "yespowerURX"
+        ];
+
+        Object.entries(data).forEach(([coin, details]) => {
+          const { algo, estimate_current, mbtc_mh_factor } = details;
+
+          let adjustedHashrate = 0;
+          if (algo === "yespowerTIDE" && yespowerTideHashrate > 0) {
+          adjustedHashrate = mbtc_mh_factor === 1 ? yespowerTideHashrate / 1000 : yespowerTideHashrate;
+          } else if (algo.startsWith("yespower") && inputHashrate > 0) {
+            adjustedHashrate = mbtc_mh_factor === 1 ? inputHashrate / 1000 : inputHashrate;
+          } else if (algo === "randomx" && randomxHashrate > 0) {
+            adjustedHashrate = mbtc_mh_factor === 1 ? randomxHashrate / 1000 : randomxHashrate;
+          } else if (algo === "verushash" && verushashHashrate > 0) {
+            adjustedHashrate = verushashHashrate / 1000;
+          } else if (algo === "xelisv2-pepew" && xelisv2Hashrate > 0) {
+            adjustedHashrate = mbtc_mh_factor === 1 ? xelisv2Hashrate / 1000 : xelisv2Hashrate;
+          } else if (algo === "scryptn2" && scryptn2Hashrate > 0) {
+            adjustedHashrate = scryptn2Hashrate / 1000;
+          } else if (algo === "randomXEQ" && randomxeqHashrate > 0) {
+            adjustedHashrate = mbtc_mh_factor === 1 ? randomxeqHashrate / 1000 : randomxeqHashrate;
+          } else if (algo === "ghostrider" && ghostriderHashrate > 0) {
+            adjustedHashrate = mbtc_mh_factor === 1 ? ghostriderHashrate / 1000 : ghostriderHashrate;
+          } else if (algo === "randomARQ" && randomarqHashrate > 0) {
+            adjustedHashrate = mbtc_mh_factor === 1 ? randomarqHashrate / 1000 : randomarqHashrate;
+          } else if (algo === "panthera" && pantheraHashrate > 0) {
+            adjustedHashrate = mbtc_mh_factor === 1 ? pantheraHashrate / 1000 : pantheraHashrate;
+          } else if (algo === "minotaurx" && minotaurxHashrate > 0) {
+            adjustedHashrate = mbtc_mh_factor === 1 ? minotaurxHashrate / 1000 : minotaurxHashrate;
+          } else if (algo === "mike" && mikeHashrate > 0) {
+            adjustedHashrate = mbtc_mh_factor === 1 ? mikeHashrate / 1000 : mikeHashrate;
+          } else if (algo === "flex" && flexHashrate > 0) {
+            adjustedHashrate = mbtc_mh_factor === 1 ? flexHashrate / 1000 : flexHashrate;
+          } else if (algo === "cryptonight_upx" && cryptonightUpxHashrate > 0) {
+            adjustedHashrate = mbtc_mh_factor === 1 ? cryptonightUpxHashrate / 1000 : cryptonightUpxHashrate;
+          } else if (targetAlgorithms.includes(algo) && inputHashrate > 0) {
+            adjustedHashrate = mbtc_mh_factor === 1 ? inputHashrate / 1000 : inputHashrate;
+          }
+
+          if (adjustedHashrate > 0) {
+            const btcPerDay = adjustedHashrate * parseFloat(estimate_current);
+            const usdPerDay = btcPerDay * btcToUsd;
+            if (btcPerDay > 0) {
+              results.push({ coin, algo, btcPerDay, usdPerDay });
+            }
+          }
+        });
+
+        results.sort((a, b) => b.btcPerDay - a.btcPerDay);
+
+        const resultsTable = document.getElementById('resultsTable');
+        resultsTable.innerHTML = `
+          <tr>
+            <th>Coin</th>
+            <th>Algorithm</th>
+            <th>BTC/Day</th>
+            <th>USD/Day</th>
+          </tr>
+        `;
+
+        results.forEach(({ coin, algo, btcPerDay, usdPerDay }) => {
+          resultsTable.innerHTML += `
+            <tr>
+              <td>${coin}</td>
+              <td>${algo}</td>
+              <td>${btcPerDay.toFixed(8)}</td>
+              <td>${usdPerDay.toFixed(2)}</td>
+            </tr>
+          `;
+        });
+
+        const mostProfitable = results[0] || null;
+        document.getElementById('result').textContent = mostProfitable
+          ? `Most profitable coin: ${mostProfitable.coin} (${mostProfitable.btcPerDay.toFixed(8)} BTC/day, $${mostProfitable.usdPerDay.toFixed(2)} USD/day)`
+          : 'No profitable coins found for the provided hashrates.';
+      } catch (error) {
+        console.error('Error fetching API data:', error);
+        document.getElementById('result').textContent = 'An error occurred while fetching data. Please try again later.';
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>Zergpool CPU Mining Profitability</h1>
+  <p>Enter your hashrates to calculate the profitability for all coins under selected algorithms:</p>
+  <form id="profitabilityForm" onsubmit="calculateProfitability(event)" class="form-section">
+    <div class="form-group">
+      <label for="hashrate_input">Yespower-based (kH/s)</label>
+      <input type="number" id="hashrate_input" step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="hashrate_randomx">RandomX (kH/s)</label>
+      <input type="number" id="hashrate_randomx" step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="hashrate_verushash">Verushash (MH/s)</label>
+      <input type="number" id="hashrate_verushash" step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="hashrate_xelisv2">Xelisv2 (kH/s)</label>
+      <input type="number" id="hashrate_xelisv2" step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="hashrate_yespowerTIDE">YespowerTIDE (kH/s)</label>
+      <input type="number" id="hashrate_yespowerTIDE" step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="hashrate_scryptn2">Scryptn2 (h/s)</label>
+      <input type="number" id="hashrate_scryptn2" step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="hashrate_randomxeq">RandomXEQ (kH/s)</label>
+      <input type="number" id="hashrate_randomxeq" step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="hashrate_ghostrider">GhostRider (kH/s)</label>
+      <input type="number" id="hashrate_ghostrider" step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="hashrate_randomarq">RandomARQ (kH/s)</label>
+      <input type="number" id="hashrate_randomarq" step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="hashrate_panthera">Panthera (kH/s)</label>
+      <input type="number" id="hashrate_panthera" step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="hashrate_minotaurx">MinotaurX (kH/s)</label>
+      <input type="number" id="hashrate_minotaurx" step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="hashrate_mike">Mike (kH/s)</label>
+      <input type="number" id="hashrate_mike" step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="hashrate_flex">Flex (kH/s)</label>
+      <input type="number" id="hashrate_flex" step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="hashrate_cryptonight_upx">Cryptonight_UPX (kH/s)</label>
+      <input type="number" id="hashrate_cryptonight_upx" step="0.01">
+    </div>
+    <button type="submit">Calculate Profitability</button>
+  </form>
+  <h2>Results</h2>
+  <p id="result" class="results-section"></p>
+  <table id="resultsTable">
+    <tr>
+      <th>Coin</th>
+      <th>Algorithm</th>
+      <th>BTC/Day</th>
+      <th>USD/Day</th>
+    </tr>
+  </table>
+</body>
+</html>
